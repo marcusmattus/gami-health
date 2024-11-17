@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Camera, CameraOff, Loader2 } from 'lucide-react'
 import type { FoodAnalysis as FoodAnalysisType } from '@/types/food'
+import Image from 'next/image'
 
 interface Props {
   onAnalysis?: (result: FoodAnalysisType) => void;
@@ -108,7 +109,13 @@ export default function CameraCapture({ onAnalysis }: Props) {
         {isCameraOn ? (
           <video ref={videoRef} autoPlay className="w-full h-full object-cover rounded-lg" />
         ) : capturedImage ? (
-          <img src={capturedImage} alt="Captured food" className="w-full h-full object-cover rounded-lg" />
+          <Image 
+            src={capturedImage} 
+            alt="Captured food" 
+            width={640}
+            height={480}
+            className="w-full h-full object-cover rounded-lg"
+          />
         ) : (
           <div className="w-full h-full bg-gray-200 flex items-center justify-center rounded-lg">
             <CameraOff className="w-12 h-12 text-gray-400" />

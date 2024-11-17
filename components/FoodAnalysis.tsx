@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Loader2, Camera } from 'lucide-react'
 import { FoodAnalysis as FoodAnalysisType, UserProgress } from '@/types/food'
 import ProgressDisplay from './ProgressDisplay'
+import Image from 'next/image'
 
 export default function FoodAnalysis() {
   const [isAnalyzing, setIsAnalyzing] = useState(false)
@@ -126,9 +127,11 @@ export default function FoodAnalysis() {
 
         {imageUrl && (
           <div className="mt-4">
-            <img 
+            <Image 
               src={imageUrl} 
               alt="Food preview" 
+              width={640}
+              height={480}
               className="max-w-sm rounded-lg shadow-lg"
             />
           </div>

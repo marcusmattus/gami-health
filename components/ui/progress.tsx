@@ -1,51 +1,27 @@
-import { useState, useEffect } from 'react'
+"use client"
 
-interface ProgressProps {
-  totalPoints: number
-  healthyChoices: number
-  unhealthyChoices: number
-  currentStreak: number
-  level: number
-}
+import * as React from "react"
+import * as ProgressPrimitive from "@radix-ui/react-progress"
+import { cn } from "@/lib/utils"
 
-const Progress: React.FC<ProgressProps> = ({ totalPoints, healthyChoices, unhealthyChoices, currentStreak, level }) => {
-  const [progress, setProgress] = useState({
-    totalPoints,
-    healthyChoices,
-    unhealthyChoices,
-    currentStreak,
-    level
-  })
+const Progress = React.forwardRef<
+  React.ElementRef<typeof ProgressPrimitive.Root>,
+  React.ComponentPropsWithoutRef<typeof ProgressPrimitive.Root>
+>(({ className, value, ...props }, ref) => (
+  <ProgressPrimitive.Root
+    ref={ref}
+    className={cn(
+      "relative h-4 w-full overflow-hidden rounded-full bg-secondary",
+      className
+    )}
+    {...props}
+  >
+    <ProgressPrimitive.Indicator
+      className="h-full w-full flex-1 bg-primary transition-all"
+      style={{ transform: `translateX(-${100 - (value || 0)}%)` }}
+    />
+  </ProgressPrimitive.Root>
+))
+Progress.displayName = ProgressPrimitive.Root.displayName
 
-  useEffect(() => {
-    setProgress({
-      totalPoints,
-      healthyChoices,
-      unhealthyChoices,
-      currentStreak,
-      level
-    })
-  }, [totalPoints, healthyChoices, unhealthyChoices, currentStreak, level])
-
-  return (
-    <div className="progress-container">
-      <div className="progress-item">
-        <span>Total Points:</span> {progress.totalPoints}
-      </div>
-      <div className="progress-item">
-        <span>Healthy Choices:</span> {progress.healthyChoices}
-      </div>
-      <div className="progress-item">
-        <span>Unhealthy Choices:</span> {progress.unhealthyChoices}
-      </div>
-      <div className="progress-item">
-        <span>Current Streak:</span> {progress.currentStreak}
-      </div>
-      <div className="progress-item">
-        <span>Level:</span> {progress.level}
-      </div>
-    </div>
-  )
-}
-
-export default Progress
+export { Progress }
