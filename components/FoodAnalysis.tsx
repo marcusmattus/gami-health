@@ -4,19 +4,21 @@ import { useState, useRef } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Loader2, Camera } from 'lucide-react'
-
-type AnalysisResult = {
-  foodItem: string
-  calories: number
-  isHealthy: boolean
-  description: string
-}
+import { FoodAnalysis as FoodAnalysisType, UserProgress } from '@/types/food'
+import ProgressDisplay from './ProgressDisplay'
 
 export default function FoodAnalysis() {
   const [isAnalyzing, setIsAnalyzing] = useState(false)
-  const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null)
+  const [analysisResult, setAnalysisResult] = useState<FoodAnalysisType | null>(null)
   const [imageUrl, setImageUrl] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const [progress, setProgress] = useState<UserProgress>({
+    totalPoints: 0,
+    healthyChoices: 0,
+    unhealthyChoices: 0,
+    currentStreak: 0,
+    level: 1
+  })
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -27,6 +29,33 @@ export default function FoodAnalysis() {
       }
       reader.readAsDataURL(file)
     }
+  }
+
+  const calculatePoints = (isHealthy: boolean): number => {
+    let points = 10; // Base points for logging food
+    
+    if (isHealthy) {
+      points += 20; // Bonus for healthy choice
+    } else {
+      points -= 5; // Penalty for unhealthy choice
+    }
+    
+    return points;
+  }
+
+  const updateProgress = (isHealthy: boolean, points: number) => {
+    setProgress(prev => {
+      const newTotalPoints = Math.max(0, prev.totalPoints + points);
+      const newLevel = Math.floor(newTotalPoints / 100) + 1;
+      
+      return {
+        totalPoints: newTotalPoints,
+        healthyChoices: isHealthy ? prev.healthyChoices + 1 : prev.healthyChoices,
+        unhealthyChoices: !isHealthy ? prev.unhealthyChoices + 1 : prev.unhealthyChoices,
+        currentStreak: isHealthy ? prev.currentStreak + 1 : 0,
+        level: newLevel
+      }
+    })
   }
 
   const analyzeFood = async () => {
@@ -43,28 +72,30 @@ export default function FoodAnalysis() {
       })
 
       const data = await response.json()
+      const isHealthy = data.result.includes('😊')
+      const points = calculatePoints(isHealthy)
       
-      // Parse the AI response to extract relevant information
-      // This is a simple example - you might need to adjust based on the AI's response format
       const result = {
         foodItem: 'Detected Food',
         calories: 100,
-        isHealthy: data.result.includes('😊'),
-        description: data.result
+        isHealthy,
+        description: data.result,
+        points,
+        timestamp: new Date().toISOString()
       }
 
       setAnalysisResult(result)
+      updateProgress(isHealthy, points)
 
-      // Store the analysis results
+      // Store the analysis results and progress
       await fetch('/api/food-history', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          foodName: data.foodName,
-          calories: data.calories,
-          timestamp: new Date().toISOString(),
+          ...result,
+          progress
         }),
       })
     } catch (error) {
@@ -118,6 +149,8 @@ export default function FoodAnalysis() {
         </Button>
       </div>
 
+      <ProgressDisplay progress={progress} />
+
       {analysisResult && (
         <Card>
           <CardHeader>
@@ -127,9 +160,9 @@ export default function FoodAnalysis() {
             <p className="text-2xl font-bold">{analysisResult.calories} calories</p>
             <p className="text-xl mt-2">
               {analysisResult.isHealthy ? (
-                <span className="text-green-500">😊 Healthy Choice!</span>
+                <span className="text-green-500">😊 Healthy Choice! (+{analysisResult.points} points)</span>
               ) : (
-                <span className="text-red-500">🤢 Unhealthy Choice</span>
+                <span className="text-red-500">🤢 Unhealthy Choice ({analysisResult.points} points)</span>
               )}
             </p>
             <p className="mt-4 text-gray-600">{analysisResult.description}</p>
