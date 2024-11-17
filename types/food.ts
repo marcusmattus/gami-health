@@ -1,12 +1,13 @@
 import { ReactNode } from 'react';
 
-export type FoodAnalysis = {
-  description: ReactNode;
+export interface FoodAnalysis {
   foodItem: string;
-  timestamp: string;
-  points: number;
   calories: number;
   isHealthy: boolean;
+  description: string;
+  points: number;
+  timestamp: string;
+  imageUrl?: string;
 } 
 
 export interface UserProgress {

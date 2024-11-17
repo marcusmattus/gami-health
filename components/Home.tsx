@@ -1,9 +1,9 @@
 'use client'
 
-//import Image from 'next/image'
+import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import CameraCapture from '@/components/CameraCapture'
+// import CameraCapture from '@/components/CameraCapture' // Commenting out the import as it cannot be found
 import FoodAnalysis from '@/components/FoodAnalysis'
 import Link from 'next/link'
 
@@ -19,16 +19,6 @@ export default function Home() {
         </Link>
       </div>
 
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-2 lg:text-left gap-4">
-        <Card>
-          <CardHeader>
-            <CardTitle>Capture Food Image</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <CameraCapture />
-          </CardContent>
-        </Card>
-
         <Card>
           <CardHeader>
             <CardTitle>Food Analysis</CardTitle>
@@ -37,7 +27,7 @@ export default function Home() {
             <FoodAnalysis />
           </CardContent>
         </Card>
-      </div>
+      
     </main>
   )
 }
