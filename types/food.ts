@@ -7,7 +7,7 @@ export interface FoodAnalysis {
   description: string;
   points: number;
   timestamp: string;
-  imageUrl?: string;
+  healthScore?: number;
 } 
 
 export interface UserProgress {
